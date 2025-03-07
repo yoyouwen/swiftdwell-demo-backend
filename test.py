@@ -28,7 +28,9 @@ test_payload = {
     "emptyRoom": {
         "image": image_base64,  # Send image as Base64 string
         "length": 5.0,
-        "width": 4.0
+        "width": 4.0,
+        "roomStyle": "bedroom",
+        "roomID": "happly"
     }
 }
 
