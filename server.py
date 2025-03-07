@@ -7,6 +7,7 @@ from PIL import Image
 import numpy as np
 import base64
 import os
+import base64
 
 app = FastAPI()
 
@@ -82,20 +83,21 @@ def process_quiz(data: QuizRequest):
     
     # Process image if provided
     if data.emptyRoom.image:
-        image_data = BytesIO(data.emptyRoom.image)
-        image = Image.open(image_data)
-        image_array = np.array(image)
-        
-        # Here, apply furniture overlay or other image processing logic
-        processed_image = image  # Replace with actual processing
-        
-        # Save processed image locally
-        image_filename = f"{OUTPUT_DIR}/livingroom1_bbaa.png"
-        processed_image.save(image_filename, format="PNG")
-        
-        # Read the saved image and encode it as base64
-        with open(image_filename, "rb") as img_file:
-            decorated_image_base64 = base64.b64encode(img_file.read()).decode("utf-8")
+        try:
+            # Decode Base64 image
+            image_bytes = base64.b64decode(data.emptyRoom.image)
+            image_data = BytesIO(image_bytes)
+            image = Image.open(image_data)
+
+            # Save processed image locally
+            image_filename = f"{OUTPUT_DIR}/decorated_room_{uuid.uuid4().hex}.png"
+            image.save(image_filename, format="PNG")
+
+            # Read the saved image and encode it as base64
+            with open(image_filename, "rb") as img_file:
+                decorated_image_base64 = base64.b64encode(img_file.read()).decode("utf-8")
+        except Exception as e:
+            return {"error": f"Image processing failed: {str(e)}"}
     else:
         decorated_image_base64 = None
     
